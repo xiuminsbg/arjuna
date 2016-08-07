@@ -2,6 +2,9 @@
   "name": "arjuna",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "4.4.7"
+  },
   "main": "app.js",
   "scripts": {
     "start": "source .env; node app.js",
