@@ -44,7 +44,7 @@ app.use('/assets', express.static(path.join(__dirname, '/public')));
 
 // mongoose.Promise = global.Promise;
 
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
 
