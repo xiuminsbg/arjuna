@@ -1,16 +1,37 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const flash = require('connect-flash');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+
 require('dotenv').config();
 var path = require('path');
 
-const promoController = require('./controllers/promoController');
-const funfactController = require('./controllers/funfactController');
+mongoose.connect(process.env.MONGODB_URI);
 
+require('./config/passport')(passport);
+
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+
+app.set('view engine', 'ejs');
+
+// required for passport
+app.use(session({ secret: 'my secret' })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
+const userController = require('./controllers/userController');
+const promoController = require('./controllers/promoController');
+const funfactController = require('./controllers/funfactController');
 
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -19,15 +40,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-mongoose.connect(process.env.MONGODB_URI);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
-
 app.use('/assets', express.static(path.join(__dirname, '/public')));
-
-app.set('view engine', 'ejs');
 
 // mongoose.Promise = global.Promise;
 
@@ -35,5 +48,6 @@ app.listen(3000, () => {
   console.log(`listening on port ${port}`);
 });
 
-promoController(app);
-funfactController(app);
+userController(app, passport);
+promoController(app, passport);
+funfactController(app, passport);

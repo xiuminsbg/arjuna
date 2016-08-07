@@ -1,8 +1,7 @@
 var Funfacts = require('../models/funFacts');
 
-module.exports = function (app) {
-  // GET All funfacts
-  app.get('/funfacts', function (req, res) {
+module.exports = function (app, passport) {
+  app.get('/funfacts', isLoggedIn, function (req, res) {
     Funfacts.find({}, function (err, funfacts) {
       if (err) throw err;
       res.send(funfacts);
@@ -10,7 +9,7 @@ module.exports = function (app) {
     });
   });
   // GET a funfact
-  app.get('/funfact/:id', function (req, res) {
+  app.get('/funfact/:id', isLoggedIn, function (req, res) {
     Funfacts.findById({_id: req.params.id}, function (err, funfacts) {
       if (err) throw err;
       res.send(funfacts);
@@ -18,7 +17,7 @@ module.exports = function (app) {
   });
 
   // ADD
-  app.post('/funfact/add', function (req, res) {
+  app.post('/funfact/add', isLoggedIn, function (req, res) {
     var newFunfact = Funfacts({
       funfactTitle: req.body.funfactTitle,
       funfactDetail: req.body.funfactDetail
@@ -30,7 +29,7 @@ module.exports = function (app) {
   });
 
   // EDIT
-  app.put('/funfact/edit/:id', function (req, res) {
+  app.put('/funfact/edit/:id', isLoggedIn, function (req, res) {
     Funfacts.findByIdAndUpdate(req.params.id, {funfactTitle: req.body.funfactTitle, funfactDetail: req.body.funfactDetail}, function (err, funfact) {
       if (err) throw err;
       res.send('Funfact edited successfully');
@@ -38,7 +37,7 @@ module.exports = function (app) {
   });
 
   // Delete
-  app.delete('/funfact/delete/:id', function (req, res) {
+  app.delete('/funfact/delete/:id', isLoggedIn, function (req, res) {
     Funfacts.findByIdAndRemove(req.params.id, function (err) {
       if (err) throw err;
       res.send('Funfact successfully deleted');
@@ -46,3 +45,13 @@ module.exports = function (app) {
     });
   });
 };
+
+function isLoggedIn (req, res, next) {
+  // if user is authenticated in the session, carry on
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    // if they aren't redirect them to the home page
+    res.redirect('/');
+  }
+}
