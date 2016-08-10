@@ -1,4 +1,3 @@
-
 module.exports = function (app, passport) {
   app.get('/', function (req, res) {
     res.status(201).json({message: 'Signup or login'});

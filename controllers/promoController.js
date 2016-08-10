@@ -2,7 +2,7 @@ var Promos = require('../models/promo');
 
 module.exports = function (app, passport) {
   // GET All promos
-  app.get('/promos', isLoggedIn, function (req, res) {
+  app.get('/promos', function (req, res) {
     Promos.find({}, function (err, promos) {
       if (err) throw err;
       res.send(promos);
@@ -10,7 +10,7 @@ module.exports = function (app, passport) {
     });
   });
   // GET a promo
-  app.get('/promo/:id', isLoggedIn, function (req, res) {
+  app.get('/promo/:id', function (req, res) {
     Promos.findById({_id: req.params.id}, function (err, promos) {
       if (err) throw err;
       res.send(promos);
@@ -18,7 +18,7 @@ module.exports = function (app, passport) {
   });
 
   // ADD
-  app.post('/promo/add', isLoggedIn, function (req, res) {
+  app.post('/promo/add', function (req, res) {
     var newPromo = Promos({
       promoTitle: req.body.promoTitle,
       promoAmount: req.body.promoAmount,
@@ -32,7 +32,7 @@ module.exports = function (app, passport) {
   });
 
   // EDIT
-  app.put('/promo/edit/:id', isLoggedIn, function (req, res) {
+  app.put('/promo/edit/:id', function (req, res) {
     Promos.findByIdAndUpdate(req.params.id, {promoTitle: req.body.promoTitle, promoAmount: req.body.promoAmount, promoDate: req.body.promoDate, promoDetail: req.body.promoDetail}, function (err, promo) {
       if (err) throw err;
       res.send('Promo edited successfully');
@@ -40,7 +40,7 @@ module.exports = function (app, passport) {
   });
 
   // Delete
-  app.delete('/promo/delete/:id', isLoggedIn, function (req, res) {
+  app.delete('/promo/delete/:id', function (req, res) {
     console.log('Promo: ' + req.params.id + 'deleted');
     Promos.findByIdAndRemove(req.params.id, function (err) {
       if (err) throw err;
@@ -49,12 +49,12 @@ module.exports = function (app, passport) {
   });
 };
 
-function isLoggedIn (req, res, next) {
-  // if user is authenticated in the session, carry on
-  if (req.isAuthenticated()) {
-    return next();
-  } else {
-    // if they aren't redirect them to the home page
-    res.redirect('/');
-  }
-}
+// function isLoggedIn (req, res, next) {
+//   // if user is authenticated in the session, carry on
+//   if (req.isAuthenticated()) {
+//     return next();
+//   } else {
+//     // if they aren't redirect them to the home page
+//     res.redirect('/');
+//   }
+// }
